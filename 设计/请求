@@ -1,0 +1,59 @@
+1 get提交。带参数。
+GET /save.action?username=&password=&love=on&love=on HTTP/1.1
+Host: localhost:12580
+Connection: keep-alive
+
+2 post提交。带参数。
+POST /save.action HTTP/1.1
+Host: localhost:12580
+Connection: keep-alive
+Content-Length: 43
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Origin: http://localhost:12580
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36
+Content-Type: application/x-www-form-urlencoded
+Referer: http://localhost:12580/
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8
+
+username=&password=&love=on&love=on&love=on
+
+3  post提交。不带参数。
+POST /save.action HTTP/1.1
+Host: localhost:12580
+Connection: keep-alive
+Content-Length: 43
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Origin: http://localhost:12580
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36
+Content-Type: application/x-www-form-urlencoded
+Referer: http://localhost:12580/
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8
+  可以通过Content-Length: 0的自己产固定判断出。当前的post到底有没有提交参数。
+
+4 post提交，文件上传。
+POST /upload.action HTTP/1.1
+Host: localhost:12580
+Connection: keep-alive
+Content-Length: 210
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Origin: http://localhost:12580
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundarypPJwvC2r1WVoPKaY
+Referer: http://localhost:12580/
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8
+
+------WebKitFormBoundarypPJwvC2r1WVoPKaY
+Content-Disposition: form-data; name="wenjianmingcheng"; filename="测试文件.txt"
+Content-Type: text/plain
+
+开头头杰微微
+------WebKitFormBoundarypPJwvC2r1WVoPKaY--

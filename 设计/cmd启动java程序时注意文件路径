@@ -1,0 +1,3 @@
+File f=new File("web.xml");
+在哪里启动jvm就会加载哪个路径下的web.xml。
+也就是在哪个路径下使用java xxx.xx执行java程序。就会在哪里加载web.xml。

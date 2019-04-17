@@ -1,0 +1,35 @@
+一 \r\n
+\r表示将光标移到下一行，但是还是同一行。
+\n表示换行。新开一行，和上一次编辑已经不再同一行了。
+
+window里面。\r\n表示换行。
+linux中。\r表示回车换行。
+
+二 一定要关闭socket。否则浏览器端一直会在等待。
+
+三 配置
+	根据url，找到包和类名，方法名。
+	反射创建对象。执行对象里面的service方法并传参。
+	
+	
+	
+	
+		//this.addCookie("JSESSIONID="+System.currentTimeMillis());
+		//	this.addCookie("name=zhangsan");
+		//	this.responseheader.put("Cache-Control", "max-age=5");
+		//Date: Fri, 05 May 2017 18:38:52 GMT
+		//Set-Cookie: JSESSIONID=3B3292C40C9D100E0F2FDC42293225C8; Path=/Test/; HttpOnly
+	
+		
+		
+	
+/*SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss 'UTC'");
+			Date d=new Date();
+			long l1=d.getTime();
+			d.setTime(l1+1000*5);
+			String gmt=sdf.format(d);
+			response.setHeader("Set-Cookie", "secondtime=34;Path=/;Expires="+gmt);*/
+			//response.setHeader("Set-Cookie", "JSESSIONID=iloveyou;path=/;Expires="+gmt);
+		
+
+	

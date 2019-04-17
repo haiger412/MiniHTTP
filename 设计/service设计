@@ -1,0 +1,15 @@
+1 浏览器当前想要做的是什么操作。只能通过几个东西来判断。
+	  请求的URI，Content-Type。
+	  如果URI请求的是普通资源，放行。
+	  如果请求的是.action结尾的。则需要拦截。
+	 为了请求动态资源。框架需要提供很多类，分别不同的action进行拦截。
+	 例如：例如，参数封装的action，格式校验的action，文件上传的action，文件下载的action。
+	 当用户自定义类实现或者或者继承这些类时，用户自定义类的方法就会被调用。
+	 实现自定义开发。
+	 
+2 service
+	当以.action结尾的请求到来时，就会执行一个类的service方法。该类叫做service类。
+	需要继承HttpService。并实现service方法。
+	调用service的方法位于SimpleHttpServiceImpl类中。
+	需要返回数据时。需要用户手动调用response身上的方法主动返回。否则页面会卡主。
+ 

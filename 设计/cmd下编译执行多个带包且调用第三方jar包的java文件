@@ -1,0 +1,54 @@
+背景
+  D:\java有三个文件。分别是：
+  exe/gonow.java
+  person/person.java
+  Student.jar
+      其中gonow.java是main函数，调用了person类的构造函数。而person构造函数中又调用了Student.jar里面的student类。
+需求：把所有.java文件编译好。并且执行含有main函数的类。
+方式一
+	步骤1：将所有.java文件编译好。带jar包编译，可以是绝对或者相对路径。
+		javac -cp D:\java\Student.jar exe\gonow person/* 
+	步骤2：设置classpath。
+		set classpath=%classpath%;D:\Student.jar
+	步骤3：执行main函数入口的类。
+		java exe.gonow
+	
+方式二：
+   	步骤1：将所有.java文件编译好。带jar包编译，可以是绝对或者相对路径。
+   	javac -cp Student.jar exe\gonow person/* 
+ 	步骤2：指定classpath执行   点号可要可不要。但是分号一定要加。
+ 	java -classpath Student.jar;. exe.gonow    
+ 	
+ 方式三：
+     步骤1：先把所有需要的jar包都加入环境classpath
+    set classpath=%classpath%;D:\Student.jar;
+    步骤2：编译多个包。
+    javac  exe\gonow person/* 
+  步骤3：运行最终的main函数入口类。
+  	java exe.gonow
+  	
+方式四：编译好之后执行绝对路径的class文件。
+java -classpath D:\java\Student.jar;D:\java\; exe.gonow
+  	
+ 既然如此：那我们只需要把所有的jar包放入一个统一的目录。需要的时候。然后使用通配符。把所有需要的东西都加入classpath。
+ 执行的时候。编译和运行的时候，jre会自己去找。
+ 
+改动如下：
+  D:\java有三个文件
+  exe/gonow.java
+  person/person.java
+  lib/Student.jar
+  
+set classpath=%classpath%;D:\java\lib\*;D:\java\;
+javac  D:\java\exe\gonow.java D:\java\person\person.java
+java exe.gonow
+上述操作。既把jar包加入classpath,也把java文件所在的非包目录的绝对路径加入classpath。这样执行的时候。就直接指定
+包名.类名。机会到classpath中去找。
+
+总结：classpath本质上就是拿着相对路径去绝对路径中查找仅此而已。没什么神奇的。
+  	
+  	
+  	
+  	
+  	
+  	

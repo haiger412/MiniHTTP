@@ -1,0 +1,179 @@
+1作用：
+	能够对当前请求和响应进行拦截。
+2 请求的过程：
+ 	2.1)client=server.accept();
+ 	2.2)new SocketManager(client).start();
+ 	2.3)SocketManager 中的 service()方法。
+ 	2.4)new SimpleHttpServiceImpl();
+ 	2.5)SimpleHttpServiceImpl类的实例中的.service(request, response);方法
+ 	2.6) 全部请求在这里进行拦截。
+ 	2.7) 当拦截的请求是.action结尾时。HttpServiceFactory factory=new HttpServiceFactory();
+ 	2.8) 执行factory.doService(request, response);做了以下两件事。
+ 		2.8.1)先执行setActionService方法。创建出HttpService接口实现类的实例。
+ 		2.8.2)再执行HttpService接口实现类的实例中的service方法。这里才是用户真正自定义的方法。
+  
+  
+  过滤器原型：只要有一个环节不通过。资源部无法访问。
+  if(uri.equals("/")){
+			File file=new File("index.html");
+			responseStaticFile(file,response);
+		}else{
+			if(uri.endsWith(".action")){
+				HttpServiceFactory factory=new HttpServiceFactory();
+				factory.doService(request, response);
+			}else if(uri.endsWith(".ico")){
+				File file=new File("favicon.icon");
+				responseStaticFile(file,response);
+			}else if(uri.indexOf(".")!=-1){
+				uri="."+uri;
+				File file=new File(uri);
+				responseStaticFile(file,response);
+			}else{//  /xx/xxx/xxx
+				responseStaticFile(null, response);
+			}
+		}
+
+	/*private void responseStaticFile(File file,MiniResponse response){
+		if(file!=null && file.exists()){
+			response.setResponseLine("HTTP/1.1 200 OK");
+			response.responseStaticFile(file);
+		}else{//404
+			response.setResponseLine("HTTP/1.1 404 Not Found");
+			response.responseStaticFile(new File("404.html"));
+		}
+	}
+	*/
+我的过滤器规范要求：
+	一个过滤器可以有多个url。
+	多个过滤器可以配置相同级别的路径。
+	
+	一个service可以有多个url。
+	多个service不可以有相同级别的url。
+===============================================================================
+	url级别：
+		 *.*--不支持																	优先级组
+		 /*--支持   拦截/下的所有请求。	不存。												  1								
+		 /xx.* 支持 拦截/下面以xx.开头的请求。   存开头。  用户可能配置： /aa.*    /bb/aa.*  优先访问前者。	  2
+		 /*.xxx  支持   拦截/下面以.xxx结尾的请求。存结尾。 用户可能配置: /*.action  					  3
+	
+当前的url到底如何匹配上过滤器和对应的service路径？
+	需要定义一个规则：类似正则表达式。但又没有那么复杂。
+	1当当前uri和多个过滤器的url匹配的上时。不仅需要生成过滤器链。还要对过滤器链中的过滤器按照url匹配上的优先级进行排序。
+	  1.1执行到service层的时候。如果当前url匹配得上多个service时。需要从中挑选出一个优先级最高的进行调用。
+	2 总结：当前url匹配的上多个过滤器时，按照路径的匹配优先级进行调用过滤器。
+		     当前url匹配得上多个service时，只会挑选一个优先级最高的service进行调用。
+		      执行不到或匹配不上时按默认处理。	
+===>那么问题来了？给出一个路径的集合。如何判断其匹配与否和优先级的高低？
+===>问题转化：字符串路径的优先级高低设计。
+===>
+	
+当前uri:  /a.jpg    
+web.xml 过滤器：
+			/*
+			/a.*
+		service:
+			/b.*      
+			/a.*
+			/a/b.*
+	
+===============================================================================
+一个过滤器链，和一个service，一次url，一个request和一个respnose都在同一个线程里。因此不会有线程安全问题。
+===============================================================================
+ String 路径=当前路径;//根据当前路径。生成一个url优先级组。 以后直接去优先级组里面找。
+ if(路径在过滤器中有配置){//根据当前路径去过滤器中查找。根据路径优先级规则。找到符合当前路径的一组过滤器，并生成过滤器链。
+    if(路径符合过滤器){//在这里直接执行service。
+    	 if(到达service层){
+    	      if(路径符合service){
+    	          	执行用户自定义的service方法();
+    	      }else{
+    	      	输出默认资源();
+    	      }
+    	 }else{
+    	   	不放行。输出默认资源();
+    	 }
+    }else if(路径符合service){//和过滤器的url不相符,或者没有配置过滤器。
+    		执行用户自定义的service方法();
+    }else{//路径既不符合过滤器也不符合service
+   		 输出默认资源();
+    }
+   
+   
+===============================================================================   
+   实现例子
+   
+public class TTTTT extends Thread{
+	public static void main(String[] args) throws Exception {
+		TTTTT t=new TTTTT();
+		t.init();
+	}
+	public void init(){
+		Fileter filter1=new MyFilter1();
+		Fileter filter2=new MyFilter2();
+		Fileter filter3=new MyFilter3();
+		ChainImpl ch=new ChainImpl();
+		ch.addFilter(filter1);
+		ch.addFilter(filter2);
+		ch.addFilter(filter3);
+		ch.doFilter();
+		
+	}
+}
+
+interface Chain{
+	public void doFilter();
+}
+class ChainImpl implements Chain{
+	//用数组即可。
+	private List<Fileter> Fileterlist=new ArrayList<Fileter>(); 
+	private int current=0;
+	private boolean executeservice=false;
+	private int count=0;
+	public void doFilter() {
+		if(current!=0)count++;
+		if(current<Fileterlist.size()){
+			Fileterlist.get(current++).Filter(this);	
+		}
+		if(executeservice==false){
+			executeservice=true;
+			if(Fileterlist.size()==0 ){
+				System.out.println("开始执行service方法");
+			}else{
+				if(count==Fileterlist.size()){
+					System.out.println("开始执行service方法");
+				}
+			}
+				
+			
+		}	
+		
+	}
+	public void addFilter(Fileter filter) {
+		Fileterlist.add(filter);
+	}
+}
+interface Fileter{
+	public void Filter(Chain Chain);
+}
+class MyFilter1 implements Fileter{
+	public void Filter(Chain chain) {
+		System.out.println("过滤器1执行前");
+		chain.doFilter();
+		System.out.println("过滤器1执行后");
+	}
+}
+class MyFilter2 implements Fileter{
+	public void Filter(Chain chain) {
+		System.out.println("过滤器2执行前");
+		chain.doFilter();
+		System.out.println("过滤器2执行后");
+	}
+	
+}
+class MyFilter3 implements Fileter{
+	public void Filter(Chain chain) {
+		System.out.println("过滤器3执行前");
+		chain.doFilter();
+		System.out.println("过滤器3执行后");
+	}
+	
+}

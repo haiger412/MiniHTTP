@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+	<filter url="/*" class="mini.sysservice.parameterService"></filter>
+	<filter url="/gotofilter*" class="mini.testfilter.Filter1"></filter>
+	<filter url="/gotofilter*" class="mini.testfilter.Filter2"></filter>
+	<filter url="/gotofilter*" class="mini.testfilter.Filter3"></filter>
+	<init>
+			<class></class>
+			<class></class>
+			<class></class>
+	</init>
+	<service name="helloworld" class="mini.testservice.myservice" ></service>
+	<service name="loginService" class="mini.testservice.LoginService" ></service>
+	<service name="ajaxtest" class="mini.testservice.ajaxTest" ></service>
+	<service  name="gotofilter1"  class="mini.testservice.filterService"/>
+	<service  name="login.service"  class="mini.testservice.Login" />
+	
+</web-app>

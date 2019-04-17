@@ -1,0 +1,69 @@
+响应头里：
+Set-Cookie:JSESSIONID=1494432317265
+Set-Cookie:name=zhangsan
+Cache-Control: max-age=秒数
+Expires和max-age选其一。
+Expires放在set-cookie后面。Expires解决的是，cooki失效后时间。一旦失效。就不再发送cookie过来。
+而max-age则是缓存的最大时间。真对不仅仅是cookie还是其他资源。例如图片，action等。
+所以不要被servlet中的max-age给误导了。servlet中的max-age是其实设置的是cookie生命周期。
+不是设置Cache-Control里面的max-age。
+cookie一般只有在改动的时候再发。
+
+如果设置Expires不生效。查看一下是否是日期格式除了问题。
+
+
+浏览器就会记住jessionid作为cookie。会在下一次请求头里发送回来。如果Cookie没有失效或者用户没有禁用cookie的话。
+请求头：
+Cookie: JSESSIONID=1494432387270; name=zhangsan 
+
+1 什么时候创建session
+	用户登录成功，才创建session。
+2 sessionid如何分配
+	获取一个唯一的sessionid
+3 sessionid 保存到哪里
+	通过cookie发送给浏览器。jessionid=sessionid
+	下一次浏览器会再发送过来。
+4 如何保证cookie和session的有效期。
+	用户登录成功后，创建一个session，并且设置超时时间。把sesionid发送给浏览器保存。
+	下一次，如果浏览器的cookie不为空
+			如果cookie里有jessionid并且该jessionid在服务端的session内存中存在。
+				那么认为该用户是合法用户。
+			否则，认为该用户是未登录用户。
+				那么提示用户登录。一旦用户登录成功，创建新的sessionid放入cookie中。需要覆盖上一次的cookie。
+			            所以这里涉及的cookie的设置。
+5 什么时候发送cookie?max-age如何设置。
+	如果设置了max-age。它是对所有cookie都生效？
+	那个请求资源设置了cookie和max-age。意味着如果浏览器缓存开启。下一次请求再超时时间以内，将不再直接从服务器获取数据
+	而是从缓存获取数据。问题来了。如果设置max-age。会导致，点击的时候，实际没有请求服务器。导致数据不实时。
+	如果不设置max-age。无法实现自动登录。
+
+6 servlet中的Cookie	
+
+	  1.浏览器开始访问网站到访问网站结束期间产生的多次请求响应组合在一起叫做一次会话
+    会话的过程中会产生会话相关的数据，我们需要将这些数据保存起来。
+    
+    Cookie：客户端技术
+    Session：服务器端技术
+    
+    2.Cookie   
+        Cookie是基于set-Cookie响应头和Cookie请求头工作的,服务器可以发送set-Cookie请求头命令浏览器保存一个cookie信息,浏览器会在访问服务器时以Cookie请求头的方式带回之前保存的信息
+        
+        request.getCookies();
+        
+        response.addCookie(Cookie c);
+        
+        new  Cookie(String name,String value)//Cookie在构造的时候就需要设定好cookie的名字和值
+        getName();
+        getValue();
+        setValue();
+        !!setMaxAge与getMaxAge方法  
+            -- 一个Cookie如果没有设置过MaxAge则这个Cookie是一个会话级别的Cookie,这个Cookie信息打给浏览器后浏览器会将它保存在浏览器的内存中,这意味着只要浏览器已关闭随着浏览器内存的销毁Cookie信息也就消失了.一个Cookie也可以设置MaxAge,浏览一一旦发现收到的Cookie被设置了MaxAge,则会将这个Cookie信息以文件的形式保存在浏览器的临时文件夹中,保存到指定的时间到来位置.这样一来即使多次开关浏览器,由于这些浏览器都能在临时文件夹中看到cookie文件,所以在cookie失效之前cookie信息都存在.
+            -- 想要命令浏览器删除一个Cookie,发送一个同名同path的cookie,maxage设置为0,浏览器以名字+path识别cookie,发现同名同path,cookie覆盖后立即超时被删除,从而就删除了cookie.
+            
+        !!setPath与getPath方法
+            -- 用来通知浏览器在访问服务器中的哪个路径及其子路径时带着当前cookie信息过来
+                如果不明确设置,则默认的路径是发送Cookie的Servlet所在的路径
+                http://localhost/Day05/servlet/...
+        setDomain与getDomain方法
+            -- 用来通知浏览器在访问哪个域名的时候带着当前的cookie信息.但是要注意,现代的浏览器一旦发现cookie设置过domain信息则会拒绝接受这个Cookie.我们平常不要设置这个方法
+     
